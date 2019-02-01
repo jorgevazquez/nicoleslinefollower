@@ -44,21 +44,21 @@ int rightDistance = 0, leftDistance = 0, middleDistance = 0;
 void forward(){
   IN1.setSpeed(carSpeed);
   IN4.setSpeed(carSpeed);
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  IN1.run(FORWARD);
+  IN2.run(RELEASE);
+  IN3.run(RELEASE);
+  IN4.run(FORWARD);
   Serial.println("go forward!");
 }
 
 // Function to go backward
 void back(){
-  IN2.setSpeed(carSpeed);
-  IN3.setSpeed(carSpeed);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
+  IN1.setSpeed(carSpeed);
+  IN4.setSpeed(carSpeed);
+  IN1.run(BACKWARD);
+  IN2.run(RELEASE);
+  IN3.run(RELEASE);
+  IN4.run(BACKWARD);
   Serial.println("go back!");
 }
 
@@ -66,10 +66,10 @@ void back(){
 void left(){
   IN2.setSpeed(carSpeed);
   IN4.setSpeed(carSpeed);
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, HIGH);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, HIGH);
+  IN1.run(RELEASE);
+  IN2.run(FORWARD);
+  IN3.run(RELEASE);
+  IN4.run(FORWARD);
   Serial.println("go left!");
 }
 
@@ -77,19 +77,19 @@ void left(){
 void right(){
   IN1.setSpeed(carSpeed);
   IN3.setSpeed(carSpeed);
-  digitalWrite(IN1, HIGH);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, HIGH);
-  digitalWrite(IN4, LOW);
+  IN1.run(FORWARD);
+  IN2.run(RELEASE);
+  IN3.run(FORWARD);
+  IN4.run(RELEASE);
   Serial.println("go right!");
 }
 
 // Function to stop
 void stop(){
-  digitalWrite(IN1, LOW);
-  digitalWrite(IN2, LOW);
-  digitalWrite(IN3, LOW);
-  digitalWrite(IN4, LOW);
+  IN1.run(RELEASE);
+  IN2.run(RELEASE);
+  IN3.run(RELEASE);
+  IN4.run(RELEASE);
   Serial.println("Stop!");
 }
 
@@ -114,10 +114,6 @@ void setup(){
   // Define the mode of our pins
   pinMode(Echo, INPUT);
   pinMode(Trig, OUTPUT);
-  pinMode(IN1, OUTPUT);
-  pinMode(IN2, OUTPUT);
-  pinMode(IN3, OUTPUT);
-  pinMode(IN4, OUTPUT);
   pinMode(LT_R,INPUT);
   pinMode(LT_M,INPUT);
   pinMode(LT_L,INPUT);
@@ -150,7 +146,7 @@ void loop() {
     // And keep going left until we don't detect anything on the left sensor
     while(LT_L);
   }
-  Otherwise, just keep going straight
+  // Otherwise, just keep going straight
   else {
       forward();
   }
