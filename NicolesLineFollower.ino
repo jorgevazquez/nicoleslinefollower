@@ -45,8 +45,6 @@ void forward(){
   IN1.setSpeed(carSpeed);
   IN4.setSpeed(carSpeed);
   IN1.run(FORWARD);
-  IN2.run(RELEASE);
-  IN3.run(RELEASE);
   IN4.run(FORWARD);
   Serial.println("go forward!");
 }
@@ -56,8 +54,6 @@ void back(){
   IN1.setSpeed(carSpeed);
   IN4.setSpeed(carSpeed);
   IN1.run(BACKWARD);
-  IN2.run(RELEASE);
-  IN3.run(RELEASE);
   IN4.run(BACKWARD);
   Serial.println("go back!");
 }
@@ -67,8 +63,6 @@ void left(){
   IN2.setSpeed(carSpeed);
   IN4.setSpeed(carSpeed);
   IN1.run(RELEASE);
-  IN2.run(FORWARD);
-  IN3.run(RELEASE);
   IN4.run(FORWARD);
   Serial.println("go left!");
 }
@@ -78,19 +72,31 @@ void right(){
   IN1.setSpeed(carSpeed);
   IN3.setSpeed(carSpeed);
   IN1.run(FORWARD);
-  IN2.run(RELEASE);
-  IN3.run(FORWARD);
   IN4.run(RELEASE);
   Serial.println("go right!");
 }
 
 // Function to stop
 void stop(){
-  IN1.run(RELEASE);
-  IN2.run(RELEASE);
-  IN3.run(RELEASE);
-  IN4.run(RELEASE);
+  IN1.run(BRAKE);
+  IN4.run(BRAKE);
   Serial.println("Stop!");
+}
+
+// Function to read the sensors
+int readLine(){
+  int left,middle,right;
+  left = LT_L;
+  middle = LT_M;
+  right = LT_R;
+
+  Serial.print( "Left is ");
+  Serial.println ( left );
+  Serial.print( "Middle is ");
+  Serial.println ( middle );
+  Serial.print( "Right is ");
+  Serial.println ( right );
+  return left,middle,right;
 }
 
 // Function to measure distance with the ultrasonic sensor
@@ -124,106 +130,65 @@ void setup(){
 }
 
 void loop() {
-  // This is where the loop begins
+  // Line Follower
 
-  // LINE FOLLOWER
-  // If we detect the middle sensor
   if(LT_M){
-    // Then go forward
     forward();
   }
-  // Else if we detect the RIGHT sensor
-  else if(LT_R) {
-    // Then go right
+  else if(LT_R) { 
     right();
-    // And keep going right until we don't detect anything on the right sensor
-    while(LT_R);
-  }
-  // Else if we detect something on the left sensor
+    while(LT_R);                             
+  }   
   else if(LT_L) {
-    // Then go left
     left();
-    // And keep going left until we don't detect anything on the left sensor
-    while(LT_L);
+    while(LT_L);  
   }
-  // Otherwise, just keep going straight
   else {
       forward();
   }
-  // OBJECT AVOIDANCE
-  // Take a reading of what is in front of us
+  
+  // Separated the obstacle detection routines 
+  servo1.write(90);  //setservo position according to scaled value
+  delay(500); 
   middleDistance = Distance_test();
-  // Print the result in the Serial monitor
   Serial.print("Middle Distance = ");
   Serial.println(middleDistance);
-
-  // If the distance to an obstacle is less than 20
-  if(middleDistance <= 20) {
-    // STOP!
+ 
+  if(middleDistance <= 20) {     
     stop();
-    // Wait half a second
-    delay(500);
-    // Now go in reverse
-    back();
-    // And set the servo to point right
-    servo1.write(0);
-    // Wait a second...
-    delay(1000);
-    // ...and stop.
-    stop();
-    //  Read the distance to any obstacle that may be on the right
+    delay(500);                         
+    servo1.write(10);          
+    delay(1000);      
     rightDistance = Distance_test();
-    // Print the right distance on the serial monitor
     Serial.print("Right Distance = ");
     Serial.println(rightDistance);
-    // Wait half a second
+  
     delay(500);
-    // Return the ultrasound sensor to the middle position
-    servo1.write(90);
-    // Wait another half a second to give the sensor a chance to catch up
-    delay(500);
-    // And now set the servo to point to the left
-    servo1.write(180);
-    // Wait another half a second so it can catch up.
-    delay(500);
-    // Take a reading to any obstacles that may be on the left
+    servo1.write(90);              
+    delay(1000);                                                  
+    servo1.write(180);              
+    delay(1000); 
     leftDistance = Distance_test();
-    // Print the left distance on the Serial monitor
     Serial.print("Left Distance = ");
     Serial.println(leftDistance);
-    // Wait half a second
+  
     delay(500);
-    // Return the ultrasound sensor to the middle position
-    servo1.write(90);
-    // And wait a second
+    servo1.write(90);              
     delay(1000);
-    // Now, if the obstacle on the left is close to us
     if(rightDistance > leftDistance) {
-      // Then let's go right
       right();
-      // And wait a third of a second before we continue
       delay(360);
     }
-    // Else if the obstacle on the right is closer to us
     else if(rightDistance < leftDistance) {
-      // Then let's go left
-      left();
-      // And wait a third of a second before we continue
-      delay(360);
+    left();
+    delay(360);
     }
-    // Else if the distance to obstacle on either side is less than 20
     else if((rightDistance <= 20) || (leftDistance <= 20)) {
-      // Then let's go in reverse
       back();
-      // And wait 180 miliseconds before we continue
       delay(180);
     }
-  // But if there is nothing in front of us
-  else {
-    // Then keep going straight
-    forward();
-  }
-  // Break out of the object avoidance code
-}
-// Go back to the start of the loop
+    else {
+        forward();
+    }
+  }                     
 }
