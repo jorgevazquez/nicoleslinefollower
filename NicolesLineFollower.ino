@@ -143,25 +143,18 @@ void loop() {
     left();
     while(LT_L);  
   }
-  else {
-      forward();
-  }
   
   // Separated the obstacle detection routines 
   servo1.write(90);  //setservo position according to scaled value
   delay(500); 
   middleDistance = Distance_test();
-  Serial.print("Middle Distance = ");
-  Serial.println(middleDistance);
- 
+
   if(middleDistance <= 20) {     
     stop();
     delay(500);                         
     servo1.write(10);          
     delay(1000);      
     rightDistance = Distance_test();
-    Serial.print("Right Distance = ");
-    Serial.println(rightDistance);
   
     delay(500);
     servo1.write(90);              
@@ -169,8 +162,6 @@ void loop() {
     servo1.write(180);              
     delay(1000); 
     leftDistance = Distance_test();
-    Serial.print("Left Distance = ");
-    Serial.println(leftDistance);
   
     delay(500);
     servo1.write(90);              
@@ -187,8 +178,6 @@ void loop() {
       back();
       delay(180);
     }
-    else {
-        forward();
-    }
-  }                     
+  }  
+  forward();                     
 }
